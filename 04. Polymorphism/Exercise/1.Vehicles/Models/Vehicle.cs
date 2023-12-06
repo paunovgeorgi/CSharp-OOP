@@ -1,0 +1,77 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using _1.Vehicles.Models.Interfaces;
+
+namespace _1.Vehicles.Models
+{
+    public abstract class Vehicle : IVehicle
+    {
+        private double increasedConsumption;
+        private double fuelQuantity;
+        protected Vehicle(double fuelQuantity, double fuelConsumption, double increasedConsumption, double tankCapacity)
+        {
+            FuelQuantity = fuelQuantity;
+            FuelConsumption = fuelConsumption;
+            this.increasedConsumption = increasedConsumption;
+            TankCapacity = tankCapacity;
+        }
+
+        public double FuelQuantity
+        {
+            get => fuelQuantity;
+            private set
+            {
+                //if (TankCapacity < value)
+                //{
+                //    fuelQuantity = 0;
+                //}
+                //else
+                {
+                    fuelQuantity = value;
+                }
+            }
+        }
+
+        public double FuelConsumption { get; private set; }
+        public double TankCapacity { get; private set; }
+
+        public string Drive(double distance, bool isIncreasedConsumption = true)
+        {
+            double consumption = 0;
+            if (isIncreasedConsumption)
+            {
+             consumption = FuelConsumption + increasedConsumption;
+            }
+            else
+            { 
+                consumption = FuelConsumption;
+            }
+            if (FuelQuantity < distance * consumption)
+            {
+                throw new ArgumentException($"{GetType().Name} needs refueling");
+            }
+
+            FuelQuantity -= distance * consumption;
+            return $"{GetType().Name} travelled {distance} km";
+        }
+
+        public virtual void Refuel(double amount)
+        {
+            if (amount <= 0)
+            {
+                throw new ArgumentException("Fuel must be a positive number");
+            }
+            if (amount + FuelQuantity > TankCapacity)
+            {
+                throw new ArgumentException($"Cannot fit {amount} fuel in the tank");
+            }
+            FuelQuantity += amount;
+        }
+
+        public override string ToString() => $"{GetType().Name}: {FuelQuantity:f2}";
+
+    }
+}
